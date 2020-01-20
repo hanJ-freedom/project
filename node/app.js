@@ -66,7 +66,6 @@ app.post('/films',(req,res)=>{
     data.forEach(ele => {
         ele.lng = Math.ceil(datafilms.length/6) 
     });
-    console.log(data)
     res.json(data)
 })
 
@@ -74,13 +73,39 @@ app.post('/films',(req,res)=>{
 app.post('/filmsdel',(req,res)=>{
     const {id} = req.body
     let index = datafilms.findIndex(item => item.id === id)
-    console.log(index)
     datafilms.splice(index,1)
-    console.log(datafilms)
-    fs.writeFile('./json/films.json',JSON.stringify(datafilms),function(err){})
+    fs.writeFile('./json/films.json',JSON.stringify(datafilms),function(err){
+        
+    })
     let obj = {
         code: 0,
         type: '删除成功'
+    }
+    res.json(obj)
+})
+
+//电影管理页修改数据请求
+app.post('/filmsalter',(req,res)=>{
+    const {data} = req.body
+    const {id} = data
+    let index = datafilms.findIndex(item => item.id === id)
+    datafilms[index] = data
+    fs.writeFile('./json/films.json',JSON.stringify(datafilms),function(err){})
+    let obj = {
+        code: 0,
+        type: '修改成功'
+    }
+    res.json(obj)
+})
+
+//电影管理页添加数据
+app.post('/filmsadd',(req,res)=>{
+    const {data} = req.body
+    datafilms.push(data)
+    fs.writeFile('./json/films.json',JSON.stringify(datafilms),function(err){})
+    let obj = {
+        code: 0,
+        type: '添加成功'
     }
     res.json(obj)
 })

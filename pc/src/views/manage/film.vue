@@ -4,11 +4,11 @@
         <el-header style="height: 70px;">
             <div style="margin-top: 5px;width:40%;display: inline-block">
                 <el-input placeholder="请输入内容" v-model="input3" class="input-with-select">
-                    <el-button slot="append" icon="el-icon-search"></el-button>
+                    <el-button slot="append" icon="el-icon-search" @click="seekfn"></el-button>
                 </el-input>
             </div>
             <el-row style="width:20%;display: inline-block">
-                <el-button type="primary">添加电影</el-button>
+                <el-button type="primary" @click="additionfn">添加电影</el-button>
             </el-row>
         </el-header>
         <el-main style="height:''">
@@ -78,11 +78,12 @@
                 :useless = "sum"
                 :page-count="num"
                 @current-change="ymfn"
+                :current-page = "ymnum"
                 >
             </el-pagination>
         </el-footer>
     </el-container>
-    <div id="redact" v-if="onoff">
+    <div class="redact" v-if="onoff">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
             <el-form-item label="电影名称" prop="name">
                 <el-input v-model="ruleForm.name"></el-input>
@@ -106,30 +107,30 @@
             </el-form-item>
             <el-form-item label="语言"  prop="language">
                 <el-select v-model="ruleForm.language" placeholder="请选择语言">
-                    <el-option label="国语" value="guoyu"></el-option>
-                    <el-option label="英语" value="yingyu"></el-option>
-                    <el-option label="韩语" value="hanyu"></el-option>
-                    <el-option label="日语" value="riyu"></el-option>
-                    <el-option label="粤语" value="ayu"></el-option>
-                    <el-option label="泰语" value="taiyu"></el-option>
-                    <el-option label="阿拉伯语" value="alaboyu"></el-option>
-                    <el-option label="朝鲜语" value="chaoxianyu"></el-option>
-                    <el-option label="意大利语" value="yidaliyu"></el-option>
+                    <el-option label="国语" value="国语"></el-option>
+                    <el-option label="英语" value="英语"></el-option>
+                    <el-option label="韩语" value="韩语"></el-option>
+                    <el-option label="日语" value="日语"></el-option>
+                    <el-option label="粤语" value="粤语"></el-option>
+                    <el-option label="泰语" value="泰语"></el-option>
+                    <el-option label="阿拉伯语" value="阿拉伯语"></el-option>
+                    <el-option label="朝鲜语" value="朝鲜语"></el-option>
+                    <el-option label="意大利语" value="意大利语"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="类型"  prop="genre">
                 <el-select v-model="ruleForm.genre" placeholder="请选择类型">
-                    <el-option label="动漫" value="dongman"></el-option>
-                    <el-option label="科幻" value="kehuan"></el-option>
-                    <el-option label="剧情" value="juqing"></el-option>
-                    <el-option label="言情" value="yanqing"></el-option>
-                    <el-option label="喜剧" value="xiju"></el-option>
-                    <el-option label="爱情" value="aiqing"></el-option>
-                    <el-option label="动作" value="dongzuo"></el-option>
-                    <el-option label="冒险" value="maoxian"></el-option>
-                    <el-option label="青春" value="qingchun"></el-option>
-                    <el-option label="悬疑" value="yuanyi"></el-option>
-                    <el-option label="恐怖" value="kongbu"></el-option>
+                    <el-option label="动漫" value="动漫"></el-option>
+                    <el-option label="科幻" value="科幻"></el-option>
+                    <el-option label="剧情" value="剧情"></el-option>
+                    <el-option label="言情" value="言情"></el-option>
+                    <el-option label="喜剧" value="喜剧"></el-option>
+                    <el-option label="爱情" value="爱情"></el-option>
+                    <el-option label="动作" value="动作"></el-option>
+                    <el-option label="冒险" value="冒险"></el-option>
+                    <el-option label="青春" value="青春"></el-option>
+                    <el-option label="悬疑" value="悬疑"></el-option>
+                    <el-option label="恐怖" value="恐怖"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="电影简介" prop="intro">
@@ -141,7 +142,65 @@
             </el-form-item>
         </el-form>
     </div>
-    
+    <div class="redact" v-if="onoff2">
+        <el-form :model="ruleForm2" :rules="rules" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
+            <el-form-item label="电影名称" prop="name">
+                <el-input v-model="ruleForm2.name"></el-input>
+            </el-form-item>
+            <el-form-item label="导演名称" prop="director">
+                <el-input v-model="ruleForm2.director"></el-input>
+            </el-form-item>
+            <el-form-item label="主演名称" prop="protagonist">
+                <el-input v-model="ruleForm2.protagonist"></el-input>
+            </el-form-item>
+            <el-form-item label="上映时间" required>
+                <el-col :span="11">
+                    <el-form-item prop="date">
+                        <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm2.date" style="width: 100%;"></el-date-picker>
+                    </el-form-item>
+                </el-col>
+            </el-form-item>
+            <el-form-item label="电影时长" prop="time">
+                <el-input placeholder="请输入内容" v-model="ruleForm2.time">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="语言"  prop="language">
+                <el-select v-model="ruleForm2.language" placeholder="请选择语言">
+                    <el-option label="国语" value="国语"></el-option>
+                    <el-option label="英语" value="英语"></el-option>
+                    <el-option label="韩语" value="韩语"></el-option>
+                    <el-option label="日语" value="日语"></el-option>
+                    <el-option label="粤语" value="粤语"></el-option>
+                    <el-option label="泰语" value="泰语"></el-option>
+                    <el-option label="阿拉伯语" value="阿拉伯语"></el-option>
+                    <el-option label="朝鲜语" value="朝鲜语"></el-option>
+                    <el-option label="意大利语" value="意大利语"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="类型"  prop="genre">
+                <el-select v-model="ruleForm2.genre" placeholder="请选择类型">
+                    <el-option label="动漫" value="动漫"></el-option>
+                    <el-option label="科幻" value="科幻"></el-option>
+                    <el-option label="剧情" value="剧情"></el-option>
+                    <el-option label="言情" value="言情"></el-option>
+                    <el-option label="喜剧" value="喜剧"></el-option>
+                    <el-option label="爱情" value="爱情"></el-option>
+                    <el-option label="动作" value="动作"></el-option>
+                    <el-option label="冒险" value="冒险"></el-option>
+                    <el-option label="青春" value="青春"></el-option>
+                    <el-option label="悬疑" value="悬疑"></el-option>
+                    <el-option label="恐怖" value="恐怖"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="电影简介" prop="intro">
+                <el-input type="textarea" v-model="ruleForm2.intro"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitForm2('ruleForm2')">确定添加</el-button>
+                <el-button @click="resetForm2('ruleForm2')">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
 </div>
     
 </template>
@@ -149,6 +208,8 @@
 <script>
 import {filmsAPI} from '../../../api/api'
 import {filmsdelAPI} from '../../../api/api'
+import {filmsalterAPI} from '../../../api/api'
+import {filmsaddAPI} from '../../../api/api'
 export default {
     data() {
         return {
@@ -157,7 +218,8 @@ export default {
             num:0,
             ymnum:1,
             onoff:false,
-            ruleForm: {
+            onoff2:false,
+            ruleForm: {      //修改数据
                 name: '',
                 director: '',
                 protagonist: '',
@@ -167,7 +229,20 @@ export default {
                 intro: '',
                 genre:''
             },
-            rules: {
+            ruleForm2: {     //添加数据
+                id:+Date.now(),
+                name: '',
+                director: '',
+                protagonist: '',
+                date: '',
+                time: 0,
+                language: '',
+                intro: '',
+                genre:'',
+                grade:0,
+                amount:0
+            },
+            rules: {        //添加数据和修改数据的验证
                 name: [
                     { required: true, message: '请输入电影名称', trigger: 'blur' },
                     { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
@@ -210,32 +285,50 @@ export default {
     },
     methods: {
         handleEdit(index, row) {       //编辑
-            this.ruleForm = row
+            for(let attr in  row){
+                this.ruleForm[attr] = row[attr]
+            }
             this.ruleForm.date = new Date(row.date)
             this.onoff = true
         },
         async handleDelete(index, row) {       //删除
             let leg = this.tableData.length
-            await filmsdelAPI(row.id)   //删除请求
+            let obj = await filmsdelAPI(row.id)   //删除请求
             if(leg === 1){         //当为当前页最后一个时
                 --this.ymnum       //将请求的数据变为上一页
                 --this.num          //总页数减一
             }
             this.tableData = await filmsAPI(this.ymnum)    //再次请求数据
             this.$message({
-                message: '删除成功',
+                message: obj.type,
                 type: 'success'
             })
         },
-        async ymfn(e){     //数据请求
+        async ymfn(e){     //页码数据请求
             this.tableData = await filmsAPI(e)
             this.num = this.tableData[0].lng
             this.ymnum=e
         },
         submitForm(formName) {  //数据的修改
-            this.$refs[formName].validate((valid) => {
+            this.$refs[formName].validate(async (valid) => {
                 if (valid) {
-                    alert('submit!');
+                    let id = this.ruleForm.id
+                    let index = this.tableData.findIndex(item => item.id === id)
+                    for(let attr in this.tableData[index]){
+                        this.tableData[index][attr] = this.ruleForm[attr]
+                    }
+                    let dates = this.tableData[index].date
+                    let year = dates.getFullYear()
+                    let month = dates.getMonth() + 1
+                    let day = dates.getDate()
+                    this.tableData[index].date = year + '-' + month + '-' + day
+                    let obj =  await filmsalterAPI(this.tableData[index])
+                    this.tableData = await filmsAPI(this.ymnum) 
+                    this.onoff = false
+                    this.$message({
+                        message: obj.type,
+                        type: 'success'
+                    })
                 } else {
                     this.$message({
                         message: '请正确填写',
@@ -245,9 +338,60 @@ export default {
                 }
             });
         },
-        resetForm(formName) {   //取消
-            this.$refs[formName].resetFields();
+        async resetForm(formName) {   //取消修改
             this.onoff = false
+        },
+        additionfn(){  //添加电影
+            this.onoff2 = true
+        },
+        submitForm2(formName){   //确定添加电影
+            console.log(this.$refs[formName])
+            this.$refs[formName].validate(async (valid) => {
+                if (valid) {
+                    //拷贝
+                    let data = {}
+                    for(let attr in this.ruleForm2){
+                        data[attr] = this.ruleForm2[attr]
+                    }
+                    //改变时间
+                    let dates = data.date
+                    let year = dates.getFullYear()
+                    let month = dates.getMonth() + 1
+                    let day = dates.getDate()
+                    data.date = year + '-' + month + '-' + day
+                    //发送添加请求
+                    let obj =  await filmsaddAPI(data)
+                    //发送刷新页面请求
+                    this.tableData = await filmsAPI(this.ymnum)
+                    //修改页码
+                    this.num = this.tableData[0].lng
+                    //关闭窗口
+                    this.onoff2 = false
+                    this.$message({
+                        message: obj.type,
+                        type: 'success'
+                    })
+                } else {
+                    this.$message({
+                        message: '请正确填写',
+                        type: 'warning'
+                    });
+                    return false;
+                }
+                this.$refs[formName].resetFields();
+            });
+        },
+        resetForm2(formName){   //取消添加电影
+            this.onoff2 = false
+            this.$refs[formName].resetFields();
+        },
+        async seekfn(){
+            console.log(this.input3.trim())
+            if(this.input3.trim() === ''){
+                this.ymnum = 1
+                this.tableData = await filmsAPI(this.ymnum)
+                this.num = this.tableData[0].lng
+            }
         }
     },
     computed:{
@@ -298,7 +442,7 @@ export default {
 }
 
 /* 编辑 */
-#redact{
+.redact{
     background-color: rgba(0, 0, 13, 0.836);
     position: absolute;
     top: 0;

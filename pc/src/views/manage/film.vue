@@ -23,7 +23,8 @@
                         prop="id"
                         label="电影 ID"
                         width="100"
-                        align="center">
+                        align="center"
+                        show-overflow-tooltip>
                     </el-table-column>
                     <el-table-column
                         prop="name"
@@ -210,6 +211,7 @@ import {filmsAPI} from '../../../api/api'
 import {filmsdelAPI} from '../../../api/api'
 import {filmsalterAPI} from '../../../api/api'
 import {filmsaddAPI} from '../../../api/api'
+import {filmssearchAPI} from '../../../api/api'
 export default {
     data() {
         return {
@@ -219,6 +221,7 @@ export default {
             ymnum:1,
             onoff:false,
             onoff2:false,
+            searchon:false,
             ruleForm: {      //修改数据
                 name: '',
                 director: '',
@@ -305,9 +308,16 @@ export default {
             })
         },
         async ymfn(e){     //页码数据请求
-            this.tableData = await filmsAPI(e)
-            this.num = this.tableData[0].lng
-            this.ymnum=e
+            if(this.input3.trim() !== ''&&this.searchon){
+                this.tableData = await filmssearchAPI(this.input3.trim(),e)
+                this.num = this.tableData[0].lng
+            }else{
+                this.tableData = await filmsAPI(e)
+                if(this.tableData.length){
+                    this.num = this.tableData[0].lng
+                    this.ymnum=e
+                }
+            }
         },
         submitForm(formName) {  //数据的修改
             this.$refs[formName].validate(async (valid) => {
@@ -385,13 +395,20 @@ export default {
             this.onoff2 = false
             this.$refs[formName].resetFields();
         },
-        async seekfn(){
-            console.log(this.input3.trim())
+        async seekfn(){      //搜索请求
+            this.ymnum = 1
             if(this.input3.trim() === ''){
-                this.ymnum = 1
-                this.tableData = await filmsAPI(this.ymnum)
+                this.tableData = await filmsAPI(1)
                 this.num = this.tableData[0].lng
+                this.searchon = false
+            }else{
+                this.tableData = await filmssearchAPI(this.input3.trim())
+                if(this.tableData.length){
+                    this.num = this.tableData[0].lng
+                    this.searchon = true
+                }
             }
+            
         }
     },
     computed:{

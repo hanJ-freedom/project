@@ -6,9 +6,8 @@ const secret = '淘气'
 const fs = require('fs')
 
 const data = JSON.parse(fs.readFileSync('./json/data.json', 'utf-8'))   //请求本地管理员数据
-// fs.writeFile('./json/data.json',JSON.stringify(data),function(err){})  //修改本地数据
-
 const datafilms = JSON.parse(fs.readFileSync('./json/films.json', 'utf-8')) //请求本地电影数据
+// fs.writeFile('./json/data.json',JSON.stringify(data),function(err){})  //修改本地数据
 
 app.use(express.static('../pc/src'));
 app.use(bodyParser.json());
@@ -108,6 +107,30 @@ app.post('/filmsadd',(req,res)=>{
         type: '添加成功'
     }
     res.json(obj)
+})
+
+//电影管理页搜索数据
+app.post('/filmssearch',(req,res)=>{
+    let {str,num} = req.body
+    let data = datafilms.filter(item=>{
+        for (const attr in item) {
+            if (attr === "genre"||attr === "name"||attr === "id"||attr === "director"||attr ==="date") {
+                let val = item[attr]+''
+                let reg = new RegExp(str,'g')
+                if(reg.test(val)){
+                    return true
+                }
+            }
+        }
+    })
+    num = !num?1:num
+    let datason = data.slice((num-1)*6,num*6)
+    if(datason.length){
+        datason.forEach(ele => {
+                ele.lng = Math.ceil(data.length/6) 
+        });
+    }
+    res.json(datason)
 })
 
 

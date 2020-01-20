@@ -17,3 +17,6 @@ export const filmsalterAPI = (data)=>instance.post('http://localhost:80/filmsalt
 
 //电影管理页添加数据请求
 export const filmsaddAPI = (data)=> instance.post('http://localhost:80/filmsadd',{data}).then(d=>d)
+
+//电影管理页搜索请求
+export const filmssearchAPI =(str,num) => instance.post('http://localhost:80/filmssearch',{str,num}).then(d=>d)

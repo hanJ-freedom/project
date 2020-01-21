@@ -68,9 +68,9 @@
                             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                         </template>
                     </el-table-column>
-                </el-table>
-            </template>
-        </div>
+                    </el-table>
+                </template>
+            </div>
         </el-main>
         <el-footer>
             <el-pagination
@@ -137,7 +137,7 @@
             <el-form-item label="电影简介" prop="intro">
                 <el-input type="textarea" v-model="ruleForm.intro"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item label-width="40px">
                 <el-button type="primary" @click="submitForm('ruleForm')">确定修改</el-button>
                 <el-button @click="resetForm('ruleForm')">取消</el-button>
             </el-form-item>
@@ -406,9 +406,10 @@ export default {
                 if(this.tableData.length){
                     this.num = this.tableData[0].lng
                     this.searchon = true
+                }else{
+                    this.num = 1
                 }
             }
-            
         }
     },
     computed:{

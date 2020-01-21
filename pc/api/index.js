@@ -9,7 +9,6 @@ const instance = axios.create()  //创建自定义拦截在需要的时候进行
 
 instance.interceptors.request.use(config=>{
     console.log('成功', '去')
-    console.log(config)
     const token = sessionStorage.getItem('token')
     if(token){
         config.headers['Authorization']=sessionStorage.getItem('token')
@@ -27,6 +26,7 @@ instance.interceptors.response.use(config=>{
     console.log(config.data)
     if(config.data.token){
         sessionStorage.setItem('token',config.data.token)
+        sessionStorage.setItem('admid',config.data.admin)
     }
     return config.data
 },error=>{

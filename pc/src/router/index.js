@@ -13,6 +13,7 @@ const routes = [
   {
     path: '/about',
     name: 'about',
+    redirect:'/about/film',
     component: () => import('../views/About.vue'),
     children:[
       {
@@ -49,6 +50,11 @@ const routes = [
         path:'order',
         name:'order',
         component:()=> import('../views/manage/order.vue')
+      },
+      {
+        path:'manager',
+        name:'manager',
+        component:()=> import('../views/manage/manager.vue')
       }
     ]
   }
@@ -58,6 +64,23 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+router.beforeEach((to,form,next)=>{ //路由跳转拦截检测是否登录
+  if(to.path==='/'){
+    next()
+  }else{
+    if(form.path === '/'){
+      if(sessionStorage.getItem('token')){
+        next()
+      }else{
+        next('/')
+      }
+    }else{
+      next()
+    }
+  }
+  
 })
 
 export default router

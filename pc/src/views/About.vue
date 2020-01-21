@@ -8,7 +8,15 @@
                 <span slot="title" style="font-size: 16px;font-weight: bolder">淘气电影</span>
               </div></el-col>
             <el-col :span="10" style="float:right"><div class="grid-content bg-purple">
-                <i class="el-icon-arrow-down el-icon--right"></i>
+                <el-dropdown :useles = "sum" trigger="click" @command="iditlo">
+                    <span class="el-dropdown-link">
+                      {{admname}}<i class="el-icon-arrow-down el-icon--right"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item command="idit">管理人员</el-dropdown-item>
+                      <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
             </div></el-col>
           </el-row>
       </el-header>
@@ -37,7 +45,35 @@ import '../assets/css/style.css'
 export default {
   data() {
     return {
-      ifnum: '1'
+      ifnum: '1',
+      admname : '',
+      admid:0
+    }
+  },
+  methods:{
+    iditlo(ev){    //下拉框的点击
+      if(ev === 'idit'){
+        this.$router.push('/about/manager')
+      }else if(ev === 'logout'){
+        this.$router.push('/')
+        sessionStorage.removeItem('admid')
+        sessionStorage.removeItem('token')
+      }
+    }
+  },
+  computed:{
+    sum(){
+      let admin = sessionStorage.getItem('admid')
+      if(!admin){
+          this.$router.push('/')
+          this.$alert('请先进行登录', '非法入侵', {
+            confirmButtonText: '确定',
+            callback: action => {}
+          });
+      }else{
+        this.admname = JSON.parse(admin).name
+        this.admid = JSON.parse(admin).id
+      }
     }
   }
 };
@@ -100,7 +136,6 @@ li{
   background-color: #e9eef3;
   color: #333;
   text-align: center;
-  line-height: 160px;
   padding: 0
 }
 .el-main div{
@@ -120,4 +155,15 @@ body > .el-container {
 .el-container:nth-child(7) .el-aside {
   line-height: 320px;
 }
+
+/* 用户 */
+.el-dropdown-link {
+    cursor: pointer;
+  }
+  .el-icon-arrow-down {
+    font-size: 12px;
+  }
+  .el-dropdown{
+    float: right
+  }
 </style>

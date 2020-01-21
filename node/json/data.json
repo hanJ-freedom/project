@@ -1,12 +1,1 @@
-[
-    {
-        "id": 1,
-        "name": "东邪",
-        "password": "123456"
-    },
-    {
-        "id": 2,
-        "name": "西毒",
-        "password": "123456"
-    }
-]
+[{"id":1,"name":"小明","password":"123456","sex":"男","phone":"13999999999","birthday":"1999-9-9","lng":2},{"id":2,"name":"小红","password":"123456","sex":"女","phone":"13666666666","birthday":"2000-9-9","lng":2},{"id":3,"name":"小蓝","password":"123456","sex":"男","phone":"13666666666","birthday":"2000-9-9","lng":2},{"id":4,"name":"小化","password":"123456","sex":"男","phone":"13666666666","birthday":"2000-9-9","lng":2},{"id":5,"name":"小个","password":"123456","sex":"女","phone":"13666666666","birthday":"2000-9-9","lng":2},{"id":6,"name":"小哈","password":"123456","sex":"女","phone":"13666666666","birthday":"2000-9-9","lng":2},{"id":1579613252250,"name":"11","password":"123456","sex":"女","phone":"11111111111","birthday":"2020-1-1","lng":2}]

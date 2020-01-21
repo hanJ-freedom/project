@@ -64,8 +64,8 @@ export default {
           const data = await loginAPI({name:this.ruleForm.name,password:this.ruleForm.checkPass})
           if(data.code === 0){
               this.$message({
-              message:data.type,
-              type: 'success'
+                message:data.type,
+                type: 'success'
             });
             this.$router.push('./about')
           }else{

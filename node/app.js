@@ -5,9 +5,9 @@ const jwt = require('jsonwebtoken')
 const secret = '淘气'
 const fs = require('fs')
 
-const data = JSON.parse(fs.readFileSync('./json/data.json', 'utf-8'))   //请求本地管理员数据
+const dataman = JSON.parse(fs.readFileSync('./json/data.json', 'utf-8'))   //请求本地管理员数据
 const datafilms = JSON.parse(fs.readFileSync('./json/films.json', 'utf-8')) //请求本地电影数据
-// fs.writeFile('./json/data.json',JSON.stringify(data),function(err){})  //修改本地数据
+// fs.writeFile('./json/data.json',JSON.stringify(dataman),function(err){})  //修改本地数据
 
 app.use(express.static('../pc/src'));
 app.use(bodyParser.json());
@@ -30,10 +30,11 @@ console.log('1', '2')
 //登录验证请求
 app.post('/login', (req, res) => {
     const { body } = req;
-    let o = data.findIndex(item => item.name === body.name);
+    let o = dataman.findIndex(item => item.name === body.name);
     let obj = null;
     if (o !== -1) {
-        if (data[o].password === body.password) {
+        if (dataman[o].password === body.password) {
+            let admin = {name:dataman[o].name,id:dataman[o].id}
             const token = jwt.sign({
                 name: body.name,
                 password: body.password
@@ -41,7 +42,8 @@ app.post('/login', (req, res) => {
             obj = {
                 code: 0,
                 type: '登录成功',
-                token
+                token,
+                admin:JSON.stringify(admin)
             }
         } else {
             obj = {
@@ -133,6 +135,77 @@ app.post('/filmssearch',(req,res)=>{
     res.json(datason)
 })
 
+//管理员数据请求
+app.post('/manager',(req,res)=>{
+    const {num} = req.body
+    let data = dataman.slice((num-1)*6,num*6)
+    data.forEach(ele => {
+        ele.lng = Math.ceil(dataman.length/6)
+    });
+    res.json(data)
+})
 
+//管理人员删除请求
+app.post('/managerdel',(req,res)=>{
+    const {id} = req.body
+    let index = dataman.findIndex(item => item.id === id)
+    dataman.splice(index,1)
+    fs.writeFile('./json/data.json',JSON.stringify(dataman),function(err){})
+    let obj = {
+        code: 0,
+        type: '删除成功'
+    }
+    res.json(obj)
+})
+
+//管理员信息修改请求
+app.post('/manageralter',(req,res)=>{
+    const {data} = req.body
+    const {id} = data
+    let index = dataman.findIndex(item => item.id === id)
+    dataman[index] = data
+    fs.writeFile('./json/data.json',JSON.stringify(dataman),function(err){})
+    let obj = {
+        code: 0,
+        type: '修改成功'
+    }
+    res.json(obj)
+})
+
+//管理员页添加新的管理员
+app.post('/manageradd',(req,res)=>{
+    const {data} = req.body
+    dataman.push(data)
+    fs.writeFile('./json/data.json',JSON.stringify(dataman),function(err){})
+    let obj = {
+        code: 0,
+        type: '添加成功'
+    }
+    res.json(obj)
+})
+
+//管理员页搜索
+app.post('/managersear',(req,res)=>{
+    let {str,num} = req.body
+    let data = dataman.filter(item=>{
+        for (const attr in item) {
+            if (attr === "sex"||attr === "name"||attr === "id"||attr === "birthday"||attr ==="phone") {
+                let val = item[attr]+''
+                let reg = new RegExp(str,'g')
+                if(reg.test(val)){
+                    return true
+                }
+            }
+        }
+    })
+    num = !num?1:num
+    let datason = data.slice((num-1)*6,num*6)
+    if(datason.length){
+        datason.forEach(ele => {
+                ele.lng = Math.ceil(data.length/6) 
+        });
+    }
+    res.json(datason)
+})
 
 app.listen(80);

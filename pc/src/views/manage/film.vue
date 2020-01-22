@@ -86,6 +86,7 @@
     </el-container>
     <div class="redact" v-if="onoff">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+            <h2 style="color:black;margin-bottom:20px">修改信息</h2>
             <el-form-item label="电影名称" prop="name">
                 <el-input v-model="ruleForm.name"></el-input>
             </el-form-item>
@@ -145,6 +146,7 @@
     </div>
     <div class="redact" v-if="onoff2">
         <el-form :model="ruleForm2" :rules="rules" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
+            <h2 style="color:black;margin-bottom:20px">添加信息</h2>
             <el-form-item label="电影名称" prop="name">
                 <el-input v-model="ruleForm2.name"></el-input>
             </el-form-item>
@@ -196,7 +198,7 @@
             <el-form-item label="电影简介" prop="intro">
                 <el-input type="textarea" v-model="ruleForm2.intro"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item label-width="40px">
                 <el-button type="primary" @click="submitForm2('ruleForm2')">确定添加</el-button>
                 <el-button @click="resetForm2('ruleForm2')">取消</el-button>
             </el-form-item>
@@ -212,6 +214,7 @@ import {filmsdelAPI} from '../../../api/api'
 import {filmsalterAPI} from '../../../api/api'
 import {filmsaddAPI} from '../../../api/api'
 import {filmssearchAPI} from '../../../api/api'
+import { MessageBox} from "element-ui";
 export default {
     data() {
         return {
@@ -294,30 +297,38 @@ export default {
             this.ruleForm.date = new Date(row.date)
             this.onoff = true
         },
-        async handleDelete(index, row) {       //删除
-            let leg = this.tableData.length
-            let obj = await filmsdelAPI(row.id)   //删除请求
-            if(leg === 1){         //当为当前页最后一个时
-                --this.ymnum       //将请求的数据变为上一页
-                --this.num          //总页数减一
-            }
-            this.tableData = await filmsAPI(this.ymnum)    //再次请求数据
-            this.$message({
-                message: obj.type,
-                type: 'success'
+        handleDelete(index, row) {       //删除
+            MessageBox.confirm(
+                "此操作将永久删除该管理人员的所有信息, 是否继续？",
+                "提示"
+            ).then(async value=>{
+                let leg = this.tableData.length
+                let obj = await filmsdelAPI(row.id)   //删除请求
+                if(leg === 1){         //当为当前页最后一个时
+                    --this.ymnum       //将请求的数据变为上一页
+                    --this.num          //总页数减一
+                }
+                if(this.input3.trim() !== ''){
+                    this.tableData = await filmssearchAPI(this.input3.trim(),this.ymnum)
+                }else{
+                    this.tableData = await filmsAPI(this.ymnum)    //再次请求数据
+                }
+                this.num = this.tableData[0]?this.tableData[0].lng:1
+                this.$message({
+                    message: obj.type,
+                    type: 'success'
+                })
             })
+            
         },
         async ymfn(e){     //页码数据请求
             if(this.input3.trim() !== ''&&this.searchon){
                 this.tableData = await filmssearchAPI(this.input3.trim(),e)
-                this.num = this.tableData[0].lng
             }else{
                 this.tableData = await filmsAPI(e)
-                if(this.tableData.length){
-                    this.num = this.tableData[0].lng
-                    this.ymnum=e
-                }
             }
+            this.ymnum=e
+            this.num = this.tableData[0]?this.tableData[0].lng:1
         },
         submitForm(formName) {  //数据的修改
             this.$refs[formName].validate(async (valid) => {
@@ -333,7 +344,11 @@ export default {
                     let day = dates.getDate()
                     this.tableData[index].date = year + '-' + month + '-' + day
                     let obj =  await filmsalterAPI(this.tableData[index])
-                    this.tableData = await filmsAPI(this.ymnum) 
+                    if(this.input3.trim() !== ''){
+                        this.tableData = await filmssearchAPI(this.input3.trim(),this.ymnum)
+                    }else{
+                        this.tableData = await filmsAPI(this.ymnum) 
+                    }
                     this.onoff = false
                     this.$message({
                         message: obj.type,
@@ -371,10 +386,14 @@ export default {
                     data.date = year + '-' + month + '-' + day
                     //发送添加请求
                     let obj =  await filmsaddAPI(data)
-                    //发送刷新页面请求
-                    this.tableData = await filmsAPI(this.ymnum)
+                    if(this.input3.trim() !== ''){
+                        this.tableData = await filmssearchAPI(this.input3.trim(),this.ymnum)
+                    }else{
+                        //发送刷新页面请求
+                        this.tableData = await filmsAPI(this.ymnum)
+                    }
                     //修改页码
-                    this.num = this.tableData[0].lng
+                    this.num = this.tableData[0]?this.tableData[0].lng:1
                     //关闭窗口
                     this.onoff2 = false
                     this.$message({
@@ -399,25 +418,18 @@ export default {
             this.ymnum = 1
             if(this.input3.trim() === ''){
                 this.tableData = await filmsAPI(1)
-                this.num = this.tableData[0].lng
                 this.searchon = false
             }else{
                 this.tableData = await filmssearchAPI(this.input3.trim())
-                if(this.tableData.length){
-                    this.num = this.tableData[0].lng
-                    this.searchon = true
-                }else{
-                    this.num = 1
-                }
+                this.searchon = true
             }
+            this.num = this.tableData[0]?this.tableData[0].lng:1
         }
     },
     computed:{
         async sum(){   //获取页码和第一次数据请求
             this.tableData = await filmsAPI(1)
-            if(this.tableData[0]){
-                this.num = this.tableData[0].lng
-            }
+            this.num = this.tableData[0]?this.tableData[0].lng:1
         }
     }
 }
@@ -475,10 +487,13 @@ export default {
     z-index: 10
 }
 .demo-ruleForm{
-    width: 30%;
+    width: 20%;
     height: 90%;
     border: 1px rgb(146, 119, 119) solid;
     padding:20px ;
     background: #fff;
+}
+.el-form-item{
+    margin-bottom: 15px;
 }
 </style>

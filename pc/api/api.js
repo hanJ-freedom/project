@@ -32,3 +32,27 @@ export const manageraddAPI = (data)=>instance.post('http://localhost:80/managera
 
 //管理人员搜索请求
 export const managersearAPI = (str,num)=>instance.post('http://localhost:80/managersear',{str,num}).then(d=>d)
+
+//用户管理页数据请求
+export const usersAPI = (num)=> instance.post('http://localhost:80/users',{num}).then(d=>d)
+
+//用户管理页面删除请求
+export const usersdelAPI =(id)=>instance.post('http://localhost:80/usersdel',{id}).then(d=>d) 
+
+//用户管理搜索请求
+export const usersearAPI = (str,num)=>instance.post('http://localhost:80/usersear',{str,num}).then(d=>d)
+
+//影院管理页数据请求
+export const cinemaAPI = (num)=>instance.post('http://localhost:80/cinema',{num}).then(d=>d)
+
+//影院管理页面删除请求
+export const cinemadelAPI =(id)=>instance.post('http://localhost:80/cinemadel',{id}).then(d=>d)  
+
+//影院管理页修改数据请求
+export const cinemalterAPI = (data)=>instance.post('http://localhost:80/cinemalter',{data}).then(d=>d)
+
+//影院管理页添加数据请求
+export const cinemaddAPI = (data)=> instance.post('http://localhost:80/cinemadd',{data}).then(d=>d)
+
+//影院管理页搜索请求
+export const cinemasearAPI =(str,num) => instance.post('http://localhost:80/cinemasear',{str,num}).then(d=>d)

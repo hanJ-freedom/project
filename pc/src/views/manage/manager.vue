@@ -123,7 +123,7 @@
     </div>
     <div class="redact" v-if="onoff2">
         <el-form :model="ruleForm2" :rules="rules" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
-            <h2 style="color:black;margin-bottom:20px">修改信息</h2>
+            <h2 style="color:black;margin-bottom:20px">添加人员</h2>
             <el-form-item label="管理员昵称" prop="name">
                 <el-input v-model="ruleForm2.name"></el-input>
             </el-form-item>
@@ -153,11 +153,12 @@
 </template>
 
 <script>
-import {manageAPI} from '../../../api/api'
-import {managedelAPI} from '../../../api/api'
-import {manageralterAPI} from '../../../api/api'
-import {manageraddAPI} from '../../../api/api'
-import {managersearAPI} from '../../../api/api'
+import {manageAPI} from '../../../api/api';
+import {managedelAPI} from '../../../api/api';
+import {manageralterAPI} from '../../../api/api';
+import {manageraddAPI} from '../../../api/api';
+import {managersearAPI} from '../../../api/api';
+import { MessageBox} from "element-ui";
 export default {
     data() {
         var valid = (rule, value, callback) => {
@@ -225,30 +226,38 @@ export default {
             this.admpass = row.password
             this.onoff = true
         },
-        async handleDelete(index, row) {       //删除
-            let leg = this.tableData.length
-            let obj = await managedelAPI(row.id)   //删除请求
-            if(leg === 1){         //当为当前页最后一个时
-                --this.ymnum       //将请求的数据变为上一页
-                --this.num          //总页数减一
-            }
-            this.tableData = await manageAPI(this.ymnum)    //再次请求数据
-            this.$message({
-                message: obj.type,
-                type: 'success'
+        handleDelete(index, row) {       //删除
+            MessageBox.confirm(
+                "此操作将永久删除该管理人员的所有信息, 是否继续？",
+                "提示"
+            ).then(async value=>{
+                let leg = this.tableData.length
+                let obj = await managedelAPI(row.id)   //删除请求
+                if(leg === 1){         //当为当前页最后一个时
+                    --this.ymnum       //将请求的数据变为上一页
+                    --this.num          //总页数减一
+                }
+                if(this.input3.trim() !== ''){
+                    this.tableData = await managersearAPI(this.input3.trim(),this.ymnum)
+                }else{
+                    this.tableData = await manageAPI(this.ymnum)    //再次请求数据
+                }
+                this.num = this.tableData[0]?this.tableData[0].lng:1
+                this.$message({
+                    message: obj.type,
+                    type: 'success'
+                })
             })
+            
         },
         async ymfn(e){     //页码数据请求
             if(this.input3.trim() !== ''){
                 this.tableData = await managersearAPI(this.input3.trim(),e)
-                this.num = this.tableData[0].lng
             }else{
                 this.tableData = await manageAPI(e)
-                if(this.tableData.length){
-                    this.num = this.tableData[0].lng
-                    this.ymnum=e
-                }
             }
+            this.num = this.tableData[0]?this.tableData[0].lng:1
+            this.ymnum=e
         },
         submitForm(formName) {  //数据的修改
             this.$refs[formName].validate(async (valid) => {
@@ -264,7 +273,11 @@ export default {
                     let day = dates.getDate()
                     this.tableData[index].birthday = year + '-' + month + '-' + day
                     let obj =  await manageralterAPI(this.tableData[index])
-                    this.tableData = await manageAPI(this.ymnum) 
+                    if(this.input3.trim() !== ''){
+                        this.tableData = await managersearAPI(this.input3.trim(),this.ymnum)
+                    }else{
+                        this.tableData = await manageAPI(this.ymnum)
+                    } 
                     this.onoff = false
                     this.$message({
                         message: obj.type,
@@ -294,9 +307,7 @@ export default {
         },
         submitForm2(formName){   //确定添加新的管理员
             this.$refs[formName].validate(async (valid) => {
-                console.log(valid)
                 if (valid) {
-                    console.log(2)
                     //拷贝
                     let data = {}
                     for(let attr in this.ruleForm2){
@@ -310,10 +321,14 @@ export default {
                     data.birthday = year + '-' + month + '-' + day
                     //发送添加请求
                     let obj =  await manageraddAPI(data)
-                    //发送刷新页面请求
-                    this.tableData = await manageAPI(this.ymnum)
+                    if(this.input3.trim() !== ''){
+                        this.tableData = await managersearAPI(this.input3.trim(),this.ymnum)
+                    }else{
+                        //发送刷新页面请求
+                        this.tableData = await manageAPI(this.ymnum)
+                    }
                     //修改页码
-                    this.num = this.tableData[0].lng
+                    this.num = this.tableData[0]?this.tableData[0].lng:1
                     console.log(1)
                     //关闭窗口
                     this.onoff2 = false
@@ -339,17 +354,16 @@ export default {
             this.ymnum = 1
             if(this.input3.trim() === ''){
                 this.tableData = await manageAPI(1)
-                this.num = this.tableData[0].lng
                 this.searchon = false
             }else{
                 this.tableData = await managersearAPI(this.input3.trim())
                 if(this.tableData.length){
-                    this.num = this.tableData[0].lng
                     this.searchon = true
                 }else{
                     this.num = 1
                 }
             }
+            this.num = this.tableData[0]?this.tableData[0].lng:1
         },
         async resetForm(formName) {   //取消修改
             this.onoff = false
@@ -358,7 +372,7 @@ export default {
     computed: {
         async sum(){   //初次的数据请求和页码请求
             this.tableData = await manageAPI(1)
-            this.num = this.tableData[0].lng
+            this.num = this.tableData[0]?this.tableData[0].lng:1
             let admin = sessionStorage.getItem('admid')
             this.admname = JSON.parse(admin).name
             this.admid = JSON.parse(admin).id

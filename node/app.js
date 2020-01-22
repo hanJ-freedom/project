@@ -7,6 +7,8 @@ const fs = require('fs')
 
 const dataman = JSON.parse(fs.readFileSync('./json/data.json', 'utf-8'))   //请求本地管理员数据
 const datafilms = JSON.parse(fs.readFileSync('./json/films.json', 'utf-8')) //请求本地电影数据
+const datausers = JSON.parse(fs.readFileSync('./json/user.json', 'utf-8'))   //请求本地用户数据
+const datacinema = JSON.parse(fs.readFileSync('./json/cinema.json', 'utf-8'))   //请求本地影院数据
 // fs.writeFile('./json/data.json',JSON.stringify(dataman),function(err){})  //修改本地数据
 
 app.use(express.static('../pc/src'));
@@ -195,6 +197,126 @@ app.post('/managersear',(req,res)=>{
                 if(reg.test(val)){
                     return true
                 }
+            }
+        }
+    })
+    num = !num?1:num
+    let datason = data.slice((num-1)*6,num*6)
+    if(datason.length){
+        datason.forEach(ele => {
+                ele.lng = Math.ceil(data.length/6) 
+        });
+    }
+    res.json(datason)
+})
+
+//用户管理页数据请求
+app.post('/users',(req,res)=>{
+    const {num} = req.body
+    let data = datausers.slice((num-1)*6,num*6)
+    data.forEach(ele => {
+        ele.lng = Math.ceil(datausers.length/6) 
+    });
+    res.json(data)
+})
+
+//用户管理页删除数据请求
+app.post('/usersdel',(req,res)=>{
+    const {id} = req.body
+    let index = datausers.findIndex(item => item.id === id)
+    datausers.splice(index,1)
+    fs.writeFile('./json/user.json',JSON.stringify(datausers),function(err){})
+    let obj = {
+        code: 0,
+        type: '删除成功'
+    }
+    res.json(obj)
+})
+
+//用户管理页搜索
+app.post('/usersear',(req,res)=>{
+    let {str,num} = req.body
+    let data = datausers.filter(item=>{
+        for (const attr in item) {
+            if (attr === "sex"||attr === "name"||attr === "id"||attr === "birthday"||attr ==="phone") {
+                let val = item[attr]+''
+                let reg = new RegExp(str,'g')
+                if(reg.test(val)){
+                    return true
+                }
+            }
+        }
+    })
+    num = !num?1:num
+    let datason = data.slice((num-1)*6,num*6)
+    if(datason.length){
+        datason.forEach(ele => {
+            ele.lng = Math.ceil(data.length/6) 
+        });
+    }
+    res.json(datason)
+})
+
+//影院管理页数据请求
+app.post('/cinema',(req,res)=>{
+    const {num} = req.body
+    let data = datacinema.slice((num-1)*6,num*6)
+    data.forEach(ele => {
+        ele.lng = Math.ceil(datacinema.length/6) 
+    });
+    res.json(data)
+})
+
+//影院管理页删除数据请求
+app.post('/cinemadel',(req,res)=>{
+    const {id} = req.body
+    let index = datacinema.findIndex(item => item.id === id)
+    datacinema.splice(index,1)
+    fs.writeFile('./json/cinema.json',JSON.stringify(datacinema),function(err){
+        
+    })
+    let obj = {
+        code: 0,
+        type: '删除成功'
+    }
+    res.json(obj)
+})
+
+//影院管理页修改数据请求
+app.post('/cinemalter',(req,res)=>{
+    const {data} = req.body
+    const {id} = data
+    let index = datacinema.findIndex(item => item.id === id)
+    datacinema[index] = data
+    fs.writeFile('./json/cinema.json',JSON.stringify(datacinema),function(err){})
+    let obj = {
+        code: 0,
+        type: '修改成功'
+    }
+    res.json(obj)
+})
+
+//影院管理页添加数据
+app.post('/cinemadd',(req,res)=>{
+    const {data} = req.body
+    datacinema.push(data)
+    fs.writeFile('./json/cinema.json',JSON.stringify(datacinema),function(err){})
+    let obj = {
+        code: 0,
+        type: '添加成功'
+    }
+    res.json(obj)
+})
+
+//影院管理页搜索数据
+app.post('/cinemasear',(req,res)=>{
+    let {str,num} = req.body
+    let data = datacinema.filter(item=>{
+        for (const attr in item) {
+            let val = item[attr]+''
+            let reg = new RegExp(str,'g')
+            if(reg.test(val)){
+                return true
             }
         }
     })

@@ -56,3 +56,21 @@ export const cinemaddAPI = (data)=> instance.post('http://localhost:80/cinemadd'
 
 //影院管理页搜索请求
 export const cinemasearAPI =(str,num) => instance.post('http://localhost:80/cinemasear',{str,num}).then(d=>d)
+
+//影厅管理页影院数据请求
+export const hallcinemaAPI = ()=>instance.post('http://localhost:80/hallcinema').then(d=>d)
+
+//影厅管理页数据请求
+export const hallAPI = (num)=>instance.post('http://localhost:80/hall',{num}).then(d=>d)
+
+//影厅管理页面删除请求
+export const halldeldelAPI =(id)=>instance.post('http://localhost:80/halldel',{id}).then(d=>d)  
+
+//影厅管理页修改数据请求
+export const hallalterAPI = (data)=>instance.post('http://localhost:80/hallalter',{data}).then(d=>d)
+
+//影厅管理页添加数据请求
+export const halladdAPI = (data)=> instance.post('http://localhost:80/halladd',{data}).then(d=>d)
+
+//影厅管理页搜索请求
+export const hallsearAPI =(str,num) => instance.post('http://localhost:80/hallsear',{str,num}).then(d=>d)

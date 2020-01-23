@@ -314,6 +314,7 @@ export default {
                     for(let attr in this.ruleForm2){
                         data[attr] = this.ruleForm2[attr]
                     }
+                    data.id =+Date.now()
                     //发送添加请求
                     let obj =  await cinemaddAPI(data)
                     if(this.input3.trim() !== ''&&this.searchon){

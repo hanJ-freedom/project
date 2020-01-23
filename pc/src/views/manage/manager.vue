@@ -313,6 +313,7 @@ export default {
                     for(let attr in this.ruleForm2){
                         data[attr] = this.ruleForm2[attr]
                     }
+                    data.id =+Date.now()
                     //改变时间
                     let dates = data.birthday
                     let year = dates.getFullYear()

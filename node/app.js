@@ -9,6 +9,7 @@ const dataman = JSON.parse(fs.readFileSync('./json/data.json', 'utf-8'))   //请
 const datafilms = JSON.parse(fs.readFileSync('./json/films.json', 'utf-8')) //请求本地电影数据
 const datausers = JSON.parse(fs.readFileSync('./json/user.json', 'utf-8'))   //请求本地用户数据
 const datacinema = JSON.parse(fs.readFileSync('./json/cinema.json', 'utf-8'))   //请求本地影院数据
+let datahall = JSON.parse(fs.readFileSync('./json/hall.json', 'utf-8'))   //请求本地影厅数据
 // fs.writeFile('./json/data.json',JSON.stringify(dataman),function(err){})  //修改本地数据
 
 app.use(express.static('../pc/src'));
@@ -271,10 +272,14 @@ app.post('/cinema',(req,res)=>{
 app.post('/cinemadel',(req,res)=>{
     const {id} = req.body
     let index = datacinema.findIndex(item => item.id === id)
+    console.log(id)
     datacinema.splice(index,1)
-    fs.writeFile('./json/cinema.json',JSON.stringify(datacinema),function(err){
-        
+    fs.writeFile('./json/cinema.json',JSON.stringify(datacinema),function(err){})
+    datahall = datahall.filter(item => {
+        console.log(item.cinema_id)
+        return item.cinema_id !== id
     })
+    fs.writeFile('./json/hall.json',JSON.stringify(datahall),function(err){})
     let obj = {
         code: 0,
         type: '删除成功'
@@ -289,6 +294,13 @@ app.post('/cinemalter',(req,res)=>{
     let index = datacinema.findIndex(item => item.id === id)
     datacinema[index] = data
     fs.writeFile('./json/cinema.json',JSON.stringify(datacinema),function(err){})
+    datahall.forEach(item=>{
+        if(item.cinema_id === id){
+            item.cinema_name = data.name
+            item.cinema_phone = data.phone
+        }
+    })
+    fs.writeFile('./json/hall.json',JSON.stringify(datahall),function(err){})
     let obj = {
         code: 0,
         type: '修改成功'
@@ -330,4 +342,89 @@ app.post('/cinemasear',(req,res)=>{
     res.json(datason)
 })
 
+//影厅管理页,影院数据请求
+app.post('/hallcinema',(req,res)=>{
+    let data = datacinema.map(item=>{
+        let obj = {}
+        obj.id = item.id
+        obj.name = item.name
+        obj.phone = item.phone
+        return obj
+    })
+    res.json(data)
+})
+
+//影厅管理页数据请求
+app.post('/hall',(req,res)=>{
+    const {num} = req.body
+    let data = datahall.slice((num-1)*6,num*6)
+    data.forEach(ele => {
+        ele.lng = Math.ceil(datahall.length/6) 
+    });
+    res.json(data)
+})
+
+//影厅管理页删除数据请求
+app.post('/halldel',(req,res)=>{
+    const {id} = req.body
+    let index = datahall.findIndex(item => item.hall_id === id)
+    datahall.splice(index,1)
+    fs.writeFile('./json/hall.json',JSON.stringify(datahall),function(err){})
+    let obj = {
+        code: 0,
+        type: '删除成功'
+    }
+    res.json(obj)
+})
+
+//影厅管理页修改数据请求
+app.post('/hallalter',(req,res)=>{
+    const {data} = req.body
+    const {hall_id} = data
+    console.log(hall_id)
+    let index = datahall.findIndex(item => item.hall_id === hall_id)
+    console.log(index)
+    datahall[index] = data
+    console.log(datahall)
+    fs.writeFile('./json/hall.json',JSON.stringify(datahall),function(err){})
+    let obj = {
+        code: 0,
+        type: '修改成功'
+    }
+    res.json(obj)
+})
+
+//影厅管理页添加数据
+app.post('/halladd',(req,res)=>{
+    const {data} = req.body
+    datahall.push(data)
+    fs.writeFile('./json/hall.json',JSON.stringify(datahall),function(err){})
+    let obj = {
+        code: 0,
+        type: '添加成功'
+    }
+    res.json(obj)
+})
+
+//影厅管理页搜索数据
+app.post('/hallsear',(req,res)=>{
+    let {str,num} = req.body
+    let data = datahall.filter(item=>{
+        for (const attr in item) {
+            let val = item[attr]+''
+            let reg = new RegExp(str,'g')
+            if(reg.test(val)){
+                return true
+            }
+        }
+    })
+    num = !num?1:num
+    let datason = data.slice((num-1)*6,num*6)
+    if(datason.length){
+        datason.forEach(ele => {
+                ele.lng = Math.ceil(data.length/6) 
+        });
+    }
+    res.json(datason)
+})
 app.listen(80);

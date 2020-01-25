@@ -10,6 +10,7 @@ const datafilms = JSON.parse(fs.readFileSync('./json/films.json', 'utf-8')) //�
 const datausers = JSON.parse(fs.readFileSync('./json/user.json', 'utf-8'))   //请求本地用户数据
 const datacinema = JSON.parse(fs.readFileSync('./json/cinema.json', 'utf-8'))   //请求本地影院数据
 let datahall = JSON.parse(fs.readFileSync('./json/hall.json', 'utf-8'))   //请求本地影厅数据
+let datasched = JSON.parse(fs.readFileSync('./json/schedule.json', 'utf-8'))   //请求本地影厅数据
 // fs.writeFile('./json/data.json',JSON.stringify(dataman),function(err){})  //修改本地数据
 
 app.use(express.static('../pc/src'));
@@ -342,7 +343,7 @@ app.post('/cinemasear',(req,res)=>{
     res.json(datason)
 })
 
-//影厅管理页,影院数据请求
+//其他页面的影院数据请求
 app.post('/hallcinema',(req,res)=>{
     let data = datacinema.map(item=>{
         let obj = {}
@@ -427,4 +428,98 @@ app.post('/hallsear',(req,res)=>{
     }
     res.json(datason)
 })
+
+//排片管理页数据请求
+app.post('/schedule',(req,res)=>{
+    const {num} = req.body
+    let data = datasched.slice((num-1)*6,num*6)
+    data.forEach(ele => {
+        ele.lng = Math.ceil(datasched.length/6) 
+    });
+    res.json(data)
+})
+
+//排片管理页删除数据请求
+app.post('/scheduledel',(req,res)=>{
+    const {id} = req.body
+    let index = datasched.findIndex(item => item.hall_id === id)
+    datasched.splice(index,1)
+    fs.writeFile('./json/hall.json',JSON.stringify(datasched),function(err){})
+    let obj = {
+        code: 0,
+        type: '删除成功'
+    }
+    res.json(obj)
+})
+
+//排片管理页修改数据请求
+app.post('/schedulealter',(req,res)=>{
+    const {data} = req.body
+    const {hall_id} = data
+    console.log(hall_id)
+    let index = datasched.findIndex(item => item.hall_id === hall_id)
+    datasched[index] = data
+    fs.writeFile('./json/hall.json',JSON.stringify(datasched),function(err){})
+    let obj = {
+        code: 0,
+        type: '修改成功'
+    }
+    res.json(obj)
+})
+
+//排片管理页添加数据
+app.post('/scheduleadd',(req,res)=>{
+    const {data} = req.body
+    datasched.push(data)
+    fs.writeFile('./json/hall.json',JSON.stringify(datasched),function(err){})
+    let obj = {
+        code: 0,
+        type: '添加成功'
+    }
+    res.json(obj)
+})
+
+//排片管理页搜索数据
+app.post('/schedulesear',(req,res)=>{
+    let {str,num} = req.body
+    let data = datasched.filter(item=>{
+        for (const attr in item) {
+            let val = item[attr]+''
+            let reg = new RegExp(str,'g')
+            if(reg.test(val)){
+                return true
+            }
+        }
+    })
+    num = !num?1:num
+    let datason = data.slice((num-1)*6,num*6)
+    if(datason.length){
+        datason.forEach(ele => {
+                ele.lng = Math.ceil(data.length/6) 
+        });
+    }
+    res.json(datason)
+})
+
+//其他页面电影数据请求
+app.post('/schedfilm',(req,res)=>{
+    let ary = datafilms.map(item=>{
+        let obj = {}
+        obj.id = item.id
+        obj.name = item.name
+        obj.date = obj.date
+        return obj
+    })
+    console.log(ary)
+    res.json(ary)
+})
+
+//排片管理页影厅数据请求
+app.post('/schedhall',(req,res)=>{
+    let {num} = req.body
+    let data = datahall.filter(item=>item.cinema_id===num)
+    console.log(data)
+    res.json(data)
+})
+
 app.listen(80);

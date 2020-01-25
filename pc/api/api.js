@@ -57,7 +57,7 @@ export const cinemaddAPI = (data)=> instance.post('http://localhost:80/cinemadd'
 //影院管理页搜索请求
 export const cinemasearAPI =(str,num) => instance.post('http://localhost:80/cinemasear',{str,num}).then(d=>d)
 
-//影厅管理页影院数据请求
+//其他页面的影院数据请求
 export const hallcinemaAPI = ()=>instance.post('http://localhost:80/hallcinema').then(d=>d)
 
 //影厅管理页数据请求
@@ -74,3 +74,24 @@ export const halladdAPI = (data)=> instance.post('http://localhost:80/halladd',{
 
 //影厅管理页搜索请求
 export const hallsearAPI =(str,num) => instance.post('http://localhost:80/hallsear',{str,num}).then(d=>d)
+
+//排片管理页数据请求
+export const scheduleAPI = (num)=>instance.post('http://localhost:80/schedule',{num}).then(d=>d)
+
+//排片管理页面删除请求
+export const scheduledelAPI =(id)=>instance.post('http://localhost:80/scheduledel',{id}).then(d=>d)  
+
+//排片管理页修改数据请求
+export const schedulealterAPI = (data)=>instance.post('http://localhost:80/schedulealter',{data}).then(d=>d)
+
+//排片管理页添加数据请求
+export const scheduleaddAPI = (data)=> instance.post('http://localhost:80/scheduleadd',{data}).then(d=>d)
+
+//排片管理页搜索请求
+export const schedulesearAPI =(str,num) => instance.post('http://localhost:80/schedulesear',{str,num}).then(d=>d)
+
+//其他页面的电影数据请求
+export const schedfilmAPI = ()=>instance.post('http://localhost:80/schedfilm').then(d=>d)
+
+//其他页面的电影数据请求
+export const schedhallAPI = (num)=>instance.post('http://localhost:80/schedhall',{num}).then(d=>d)

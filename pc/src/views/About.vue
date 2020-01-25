@@ -27,7 +27,7 @@
               <router-link :to="{name:'film'}" tag="li"><i class="el-icon-s-flag"></i><span>电影管理</span> </router-link>
               <router-link :to="{name:'cinema'}" tag="li"><i class="el-icon-video-camera-solid"></i><span>影院管理</span> </router-link>
               <router-link :to="{name:'moviehall'}" tag="li"><i class="el-icon-bangzhu"></i><span>影厅管理</span></router-link>
-              <router-link :to="{name:'rowpiece'}" tag="li"><i class="el-icon-s-fold"></i><span>电影排片</span></router-link>
+              <router-link :to="{name:'schedule'}" tag="li"><i class="el-icon-s-fold"></i><span>电影排片</span></router-link>
               <router-link :to="{name:'comment'}" tag="li"><i class="el-icon-s-comment"></i><span>评论管理</span></router-link>
               <router-link :to="{name:'order'}" tag="li"><i class="el-icon-s-ticket"></i><span>订单管理</span></router-link>
             </ul>

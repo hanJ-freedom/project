@@ -37,9 +37,9 @@ const routes = [
         component:()=> import('../views/manage/moviehall.vue')
       },
       {
-        path:'rowpiece',
-        name:'rowpiece',
-        component:()=> import('../views/manage/rowpiece.vue')
+        path:'schedule',
+        name:'schedule',
+        component:()=> import('../views/manage/schedule.vue')
       },
       {
         path:'comment',

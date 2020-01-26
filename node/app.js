@@ -10,7 +10,7 @@ const datafilms = JSON.parse(fs.readFileSync('./json/films.json', 'utf-8')) //�
 const datausers = JSON.parse(fs.readFileSync('./json/user.json', 'utf-8'))   //请求本地用户数据
 const datacinema = JSON.parse(fs.readFileSync('./json/cinema.json', 'utf-8'))   //请求本地影院数据
 let datahall = JSON.parse(fs.readFileSync('./json/hall.json', 'utf-8'))   //请求本地影厅数据
-let datasched = JSON.parse(fs.readFileSync('./json/schedule.json', 'utf-8'))   //请求本地影厅数据
+let datasched = JSON.parse(fs.readFileSync('./json/schedule.json', 'utf-8'))   //请求本地排片数据
 // fs.writeFile('./json/data.json',JSON.stringify(dataman),function(err){})  //修改本地数据
 
 app.use(express.static('../pc/src'));
@@ -79,9 +79,11 @@ app.post('/filmsdel',(req,res)=>{
     const {id} = req.body
     let index = datafilms.findIndex(item => item.id === id)
     datafilms.splice(index,1)
-    fs.writeFile('./json/films.json',JSON.stringify(datafilms),function(err){
-        
+    fs.writeFile('./json/films.json',JSON.stringify(datafilms),function(err){})
+    datasched = datasched.filter(item => {
+        return item.films_id !== id
     })
+    fs.writeFile('./json/schedule.json',JSON.stringify(datasched),function(err){})
     let obj = {
         code: 0,
         type: '删除成功'
@@ -273,14 +275,16 @@ app.post('/cinema',(req,res)=>{
 app.post('/cinemadel',(req,res)=>{
     const {id} = req.body
     let index = datacinema.findIndex(item => item.id === id)
-    console.log(id)
     datacinema.splice(index,1)
     fs.writeFile('./json/cinema.json',JSON.stringify(datacinema),function(err){})
     datahall = datahall.filter(item => {
-        console.log(item.cinema_id)
         return item.cinema_id !== id
     })
     fs.writeFile('./json/hall.json',JSON.stringify(datahall),function(err){})
+    datasched = datasched.filter(item => {
+        return item.cinema_id !== id
+    })
+    fs.writeFile('./json/schedule.json',JSON.stringify(datasched),function(err){})
     let obj = {
         code: 0,
         type: '删除成功'
@@ -368,9 +372,14 @@ app.post('/hall',(req,res)=>{
 //影厅管理页删除数据请求
 app.post('/halldel',(req,res)=>{
     const {id} = req.body
+    console.log(id)
     let index = datahall.findIndex(item => item.hall_id === id)
     datahall.splice(index,1)
     fs.writeFile('./json/hall.json',JSON.stringify(datahall),function(err){})
+    datasched = datasched.filter(item => {
+        return item.hall_id !== id
+    })
+    fs.writeFile('./json/schedule.json',JSON.stringify(datasched),function(err){})
     let obj = {
         code: 0,
         type: '删除成功'
@@ -381,13 +390,10 @@ app.post('/halldel',(req,res)=>{
 //影厅管理页修改数据请求
 app.post('/hallalter',(req,res)=>{
     const {data} = req.body
-    const {hall_id} = data
-    console.log(hall_id)
+    const {hall_id} = datafilms
     let index = datahall.findIndex(item => item.hall_id === hall_id)
-    console.log(index)
     datahall[index] = data
-    console.log(datahall)
-    fs.writeFile('./json/hall.json',JSON.stringify(datahall),function(err){})
+    fs.writeFile('./json/schedule.json',JSON.stringify(datahall),function(err){})
     let obj = {
         code: 0,
         type: '修改成功'
@@ -399,7 +405,7 @@ app.post('/hallalter',(req,res)=>{
 app.post('/halladd',(req,res)=>{
     const {data} = req.body
     datahall.push(data)
-    fs.writeFile('./json/hall.json',JSON.stringify(datahall),function(err){})
+    fs.writeFile('./json/schedule.json',JSON.stringify(datahall),function(err){})
     let obj = {
         code: 0,
         type: '添加成功'
@@ -444,7 +450,7 @@ app.post('/scheduledel',(req,res)=>{
     const {id} = req.body
     let index = datasched.findIndex(item => item.hall_id === id)
     datasched.splice(index,1)
-    fs.writeFile('./json/hall.json',JSON.stringify(datasched),function(err){})
+    fs.writeFile('./json/schedule.json',JSON.stringify(datasched),function(err){})
     let obj = {
         code: 0,
         type: '删除成功'
@@ -455,11 +461,10 @@ app.post('/scheduledel',(req,res)=>{
 //排片管理页修改数据请求
 app.post('/schedulealter',(req,res)=>{
     const {data} = req.body
-    const {hall_id} = data
-    console.log(hall_id)
-    let index = datasched.findIndex(item => item.hall_id === hall_id)
+    const {schedule_id} = data
+    let index = datasched.findIndex(item => item.schedule_id === schedule_id)
     datasched[index] = data
-    fs.writeFile('./json/hall.json',JSON.stringify(datasched),function(err){})
+    fs.writeFile('./json/schedule.json',JSON.stringify(datasched),function(err){})
     let obj = {
         code: 0,
         type: '修改成功'
@@ -507,10 +512,9 @@ app.post('/schedfilm',(req,res)=>{
         let obj = {}
         obj.id = item.id
         obj.name = item.name
-        obj.date = obj.date
+        obj.date = item.date
         return obj
     })
-    console.log(ary)
     res.json(ary)
 })
 
@@ -518,7 +522,6 @@ app.post('/schedfilm',(req,res)=>{
 app.post('/schedhall',(req,res)=>{
     let {num} = req.body
     let data = datahall.filter(item=>item.cinema_id===num)
-    console.log(data)
     res.json(data)
 })
 

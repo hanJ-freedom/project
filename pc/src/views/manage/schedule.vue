@@ -8,7 +8,7 @@
                 </el-input>
             </div>
             <el-row style="width:20%;display: inline-block">
-                <el-button type="primary" @click="additionfn">添加影院</el-button>
+                <el-button type="primary" @click="additionfn">添加排片</el-button>
             </el-row>
         </el-header>
         <el-main style="height:''">
@@ -98,12 +98,12 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="影院名称"  prop="cinema_name">
-                <el-select v-model="ruleForm.cinema_name" placeholder="请选择类型" >
+                <el-select v-model="ruleForm.cinema_name" placeholder="请选择类型"  @change="cinemafn">
                     <el-option v-for="(val,key) in cineocj" :label="val.name" :value="val.name"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="影厅名称"  prop="hall_name" v-if="hallonoff">
-                <el-select v-model="ruleForm.hall_name" placeholder="请选择类型" >
+                <el-select v-model="ruleForm.hall_name" placeholder="请选择类型">
                     <el-option v-for="(val,key) in hallobj" :label="val.hall_name" :value="val.hall_name"></el-option>
                 </el-select>
             </el-form-item>
@@ -131,7 +131,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="影院名称"  prop="cinema_name">
-                <el-select v-model="ruleForm2.cinema_name" placeholder="请选择类型" >
+                <el-select v-model="ruleForm2.cinema_name" placeholder="请选择类型" @change="cinemafn">
                     <el-option v-for="(val,key) in cineocj" :label="val.name" :value="val.name"></el-option>
                 </el-select>
             </el-form-item>
@@ -140,7 +140,7 @@
                     <el-option v-for="(val,key) in hallobj" :label="val.hall_name" :value="val.hall_name"></el-option>
                 </el-select>
             </el-form-item>
-              <el-form-item label="活动时间" prop="show_date">
+              <el-form-item label="活动时间" prop="show_date2">
                 <el-col :span="11">
                     <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm2.show_date" style="width: 100%;"></el-date-picker>
                 </el-col>
@@ -171,21 +171,29 @@ import {schedulesearAPI} from '../../../api/api'
 import {MessageBox} from "element-ui";
 export default {
     data() {
-        var valid = async (rule, value, callback) => {
-            console.log(2)
-            if (value.trim() !== '') {
-                let id = 0
-                this.cineocj.forEach(item => {
-                    if(item.name === value){
-                        id = item.id
-                    }
-                });
-                console.log(1)
-                this.hallonoff = true
-                this.hallobj = await schedhallAPI(id)
+        var valid = (rule, value, callback) => {
+            let time = 0
+            this.filmobj.forEach(item => {
+                if(item.name === this.ruleForm.films_name){
+                    time = item.date
+                }
+            });
+            if (+new Date(value)>+new Date(time)||+new Date(value)===+new Date(time)) {
                 callback();
             }
-            callback(new Error('请选择影院'));
+            callback(new Error('播放时间不能在首映时间之前'));
+        };
+        var valid2 = (rule, value, callback) => {
+            let time = 0
+            this.filmobj.forEach(item => {
+                if(item.name === this.ruleForm2.films_name){
+                    time = item.date
+                }
+            });
+            if (+new Date(this.ruleForm2.show_date)>+new Date(time)||+new Date(this.ruleForm2.show_date)===+new Date(time)) {
+                callback();
+            }
+            callback(new Error('播放时间不能在首映时间之前'));
         };
         return {
             input3: '',
@@ -205,7 +213,8 @@ export default {
                 schedule_id:'',
                 show_date:'',
                 show_time:'',
-                films_name:''
+                films_name:'',
+                seat_info:[]
             },
             ruleForm2: {     //添加数据
                 schedule_id:+Date.now(),
@@ -213,20 +222,25 @@ export default {
                 cinema_name: '',
                 show_date:'',
                 show_time:'',
-                films_name:''
+                films_name:'',
+                seat_info:[]
             },
             rules: {        //添加数据和修改数据的验证
                 hall_name: [
                     { required: true, message: '请输入影厅名称', trigger: 'blur' }
                 ],
                 cinema_name: [
-                    {validator : valid ,trigger: 'blur'}
+                    { required: true, message: '请输入影院名称', trigger: 'blur' }
                 ],
                 films_name: [
                     { required: true, message: '请输入影片名称', trigger: 'blur' }
                 ],
                 show_date: [
-                    { required: true, message: '请输入上映时间', trigger: 'blur' }
+                    { required: true, message: '请输入上映时间', trigger: 'blur' },
+                    { validator : valid ,trigger: 'blur'}
+                ],
+                show_date2: [
+                    { validator : valid2 ,trigger: 'blur'}
                 ],
             }
         }
@@ -237,10 +251,27 @@ export default {
         this.filmobj = await schedfilmAPI()
     },
     methods: {
+        async cinemafn(value){    //点击影院后获取对应的影厅
+            let id = 0
+            this.cineocj.forEach(item => {
+                if(item.name === value){
+                    id = item.id
+                }
+            });
+            this.hallonoff = true
+            this.hallobj = await schedhallAPI(id)
+        },
         handleEdit(index, row) {       //编辑
             for(let attr in  row){
                 this.ruleForm[attr] = row[attr]
             }
+            this.ruleForm.show_date = new Date(row.show_date)
+            let hours = row.show_time.split(':')[0]
+            let minutes = row.show_time.split(':')[1]
+            let date = new Date()
+            date.setHours(+hours)
+            date.setMinutes(+minutes)
+            this.ruleForm.show_time = date
             this.onoff = true
         },
         handleDelete(index, row) {       //删除
@@ -284,11 +315,40 @@ export default {
                     for(let attr in this.tableData[index]){
                         this.tableData[index][attr] = this.ruleForm[attr]
                     }
+                    //请求影院对应的影厅
                     let cinename = this.tableData[index].cinema_name
-                    let [cineobj] = this.cineocj.filter(item => item.name === cinename)
-                    this.tableData[index].cinema_id = cineobj.id
-                    this.tableData[index].cinema_phone = cineobj.phone
-                    console.log(cinename,this.tableData[index])
+                    let ceneid = 0
+                    this.cineocj.forEach(item => {
+                        if(item.name === cinename){
+                            ceneid = item.id
+                        }
+                    });
+                    this.hallobj = await schedhallAPI(ceneid)
+                    //获取影院和影厅对应的id
+                    let hallname = this.tableData[index].hall_name
+                    let [cineobj] = this.hallobj.filter(item => item.cinema_name === cinename&&item.hall_name === hallname)
+                    this.tableData[index].cinema_id = cineobj.cinema_id
+                    this.tableData[index].hall_id = cineobj.hall_id
+                    
+                    //获取电影对应的id
+                    let filmname = this.tableData[index].films_name
+                    let [filmo] = this.filmobj.filter(item => item.name === filmname)
+                    this.tableData[index].films_id = filmo.id
+                    this.tableData[index].films_name = filmo.name
+                    //改变日期
+                    let dates = this.tableData[index].show_date
+                    let year = dates.getFullYear()
+                    let month = dates.getMonth() + 1
+                    let day = dates.getDate()
+                    this.tableData[index].show_date = year + '-' + month + '-' + day
+                    //改变时间
+                    let dates2 = this.tableData[index].show_time
+                    console.log(dates2)
+                    let hours = dates2.getHours()
+                    let minutes = dates2.getMinutes()
+                    this.tableData[index].show_time = hours + ':' + minutes
+                    console.log(this.tableData[index])
+                    //修改请求
                     let obj =  await schedulealterAPI(this.tableData[index])
                     if(this.input3.trim() !== ''&&this.searchon){
                         this.tableData = await schedulesearAPI(this.input3.trim(),this.ymnum)
@@ -314,10 +374,10 @@ export default {
             this.onoff = false
             this.hallonoff = false
         },
-        additionfn(){  //添加影厅
+        additionfn(){  //添加排片
             this.onoff2 = true
         },
-        submitForm2(formName){   //确定添加影厅
+        submitForm2(formName){   //确定添加排片
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
                     //拷贝
@@ -325,11 +385,30 @@ export default {
                     for(let attr in this.ruleForm2){
                         data[attr] = this.ruleForm2[attr]
                     }
+                    //获取影院对应的id
                     let cinename = data.cinema_name
-                    let [cineobj] = this.cineocj.filter(item => item.name === cinename)
-                    data.cinema_id = cineobj.id
-                    data.cinema_phone = cineobj.phone
-                    data.hall_id = +Date.now()
+                    let hallname = data.hall_name
+                    let [cineobj] = this.hallobj.filter(item => item.cinema_name === cinename&&item.hall_name === hallname)
+                    data.cinema_id = cineobj.cinema_id
+                    data.hall_id = cineobj.hall_id
+                    //获取电影对应的id
+                    let filmname = data.films_name
+                    let [filmo] = this.filmobj.filter(item => item.name === filmname)
+                    data.films_id = filmo.id
+                    data.films_name = filmo.name
+                    //给新的排片添加新的id
+                    data.schedule_id = +Date.now()
+                    //改变日期
+                    let dates = data.show_date
+                    let year = dates.getFullYear()
+                    let month = dates.getMonth() + 1
+                    let day = dates.getDate()
+                    data.show_date = year + '-' + month + '-' + day
+                    //改变时间
+                    let dates2 = data.show_time
+                    let hours = dates2.getHours()
+                    let minutes = dates2.getMinutes()
+                    data.show_time = hours + ':' + minutes
                     //发送添加请求
                     let obj =  await scheduleaddAPI(data)
                     if(this.input3.trim() !== ''&&this.searchon){

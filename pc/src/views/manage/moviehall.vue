@@ -8,7 +8,7 @@
                 </el-input>
             </div>
             <el-row style="width:20%;display: inline-block">
-                <el-button type="primary" @click="additionfn">添加影院</el-button>
+                <el-button type="primary" @click="additionfn">添加影厅</el-button>
             </el-row>
         </el-header>
         <el-main style="height:''">
@@ -171,7 +171,7 @@ export default {
                 "提示"
             ).then(async value=>{
                 let leg = this.tableData.length
-                let obj = await halldeldelAPI(row.id)   //删除请求
+                let obj = await halldeldelAPI(row.hall_id)   //删除请求
                 if(leg === 1){         //当为当前页最后一个时
                     --this.ymnum       //将请求的数据变为上一页
                     --this.num          //总页数减一

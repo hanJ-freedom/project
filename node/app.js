@@ -11,6 +11,8 @@ const datausers = JSON.parse(fs.readFileSync('./json/user.json', 'utf-8'))   //�
 const datacinema = JSON.parse(fs.readFileSync('./json/cinema.json', 'utf-8'))   //请求本地影院数据
 let datahall = JSON.parse(fs.readFileSync('./json/hall.json', 'utf-8'))   //请求本地影厅数据
 let datasched = JSON.parse(fs.readFileSync('./json/schedule.json', 'utf-8'))   //请求本地排片数据
+let datacomment = JSON.parse(fs.readFileSync('./json/comment.json', 'utf-8'))   //请求本地评论数据
+let dataorder = JSON.parse(fs.readFileSync('./json/order.json', 'utf-8'))   //请求本地订单数据
 // fs.writeFile('./json/data.json',JSON.stringify(dataman),function(err){})  //修改本地数据
 
 app.use(express.static('../pc/src'));
@@ -523,6 +525,96 @@ app.post('/schedhall',(req,res)=>{
     let {num} = req.body
     let data = datahall.filter(item=>item.cinema_id===num)
     res.json(data)
+})
+
+//评论管理页数据请求
+app.post('/comment',(req,res)=>{
+    const {num} = req.body
+    let data = datacomment.slice((num-1)*6,num*6)
+    data.forEach(ele => {
+        ele.lng = Math.ceil(datacomment.length/6) 
+    });
+    res.json(data)
+})
+
+//评论管理页删除数据请求
+app.post('/commentdel',(req,res)=>{
+    const {id} = req.body
+    let index = datacomment.findIndex(item => item.comment_id === id)
+    datacomment.splice(index,1)
+    fs.writeFile('./json/comment.json',JSON.stringify(datacomment),function(err){})
+    let obj = {
+        code: 0,
+        type: '删除成功'
+    }
+    res.json(obj)
+})
+
+//评论管理页搜索
+app.post('/commentsear',(req,res)=>{
+    let {str,num} = req.body
+    let data = datacomment.filter(item=>{
+        for (const attr in item) {
+            let val = item[attr]+''
+            let reg = new RegExp(str,'g')
+            if(reg.test(val)){
+                return true
+            }
+        }
+    })
+    num = !num?1:num
+    let datason = data.slice((num-1)*6,num*6)
+    if(datason.length){
+        datason.forEach(ele => {
+            ele.lng = Math.ceil(data.length/6) 
+        });
+    }
+    res.json(datason)
+})
+
+//订单管理页数据请求
+app.post('/order',(req,res)=>{
+    const {num} = req.body
+    let data = dataorder.slice((num-1)*6,num*6)
+    data.forEach(ele => {
+        ele.lng = Math.ceil(dataorder.length/6) 
+    });
+    res.json(data)
+})
+
+//订单管理页删除数据请求
+app.post('/orderdel',(req,res)=>{
+    const {id} = req.body
+    let index = dataorder.findIndex(item => item.order_id === id)
+    dataorder.splice(index,1)
+    fs.writeFile('./json/order.json',JSON.stringify(dataorder),function(err){})
+    let obj = {
+        code: 0,
+        type: '删除成功'
+    }
+    res.json(obj)
+})
+
+//订单管理页搜索
+app.post('/ordersear',(req,res)=>{
+    let {str,num} = req.body
+    let data = dataorder.filter(item=>{
+        for (const attr in item) {
+            let val = item[attr]+''
+            let reg = new RegExp(str,'g')
+            if(reg.test(val)){
+                return true
+            }
+        }
+    })
+    num = !num?1:num
+    let datason = data.slice((num-1)*6,num*6)
+    if(datason.length){
+        datason.forEach(ele => {
+            ele.lng = Math.ceil(data.length/6) 
+        });
+    }
+    res.json(datason)
 })
 
 app.listen(80);

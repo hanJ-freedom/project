@@ -95,3 +95,21 @@ export const schedfilmAPI = ()=>instance.post('http://localhost:80/schedfilm').t
 
 //其他页面的电影数据请求
 export const schedhallAPI = (num)=>instance.post('http://localhost:80/schedhall',{num}).then(d=>d)
+
+//评论管理页数据请求
+export const commentAPI = (num)=> instance.post('http://localhost:80/comment',{num}).then(d=>d)
+
+//评论管理页面删除请求
+export const commentdelAPI =(id)=>instance.post('http://localhost:80/commentdel',{id}).then(d=>d) 
+
+//评论管理搜索请求
+export const commentsearAPI = (str,num)=>instance.post('http://localhost:80/commentsear',{str,num}).then(d=>d)
+
+//订单管理页数据请求
+export const orderAPI = (num)=> instance.post('http://localhost:80/order',{num}).then(d=>d)
+
+//订单管理页面删除请求
+export const orderdelAPI =(id)=>instance.post('http://localhost:80/orderdel',{id}).then(d=>d) 
+
+//订单管理搜索请求
+export const ordersearAPI = (str,num)=>instance.post('http://localhost:80/ordersear',{str,num}).then(d=>d)

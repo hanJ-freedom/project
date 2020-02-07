@@ -617,4 +617,19 @@ app.post('/ordersear',(req,res)=>{
     res.json(datason)
 })
 
+
+
+
+//***********************************************手机端数据请求************************************************************
+
+//手机端主页电影数据请求
+app.post('/phfilm',(req,res)=>{
+    res.json(datafilms)
+})
+
+//手机端影院数据请求
+app.post('/phcinema',(req,res)=>{
+    res.json(datacinema)
+})
+
 app.listen(80);

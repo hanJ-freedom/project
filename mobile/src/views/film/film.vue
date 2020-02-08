@@ -15,7 +15,7 @@
                     <p><span>类型 :</span><span>{{val.genre}}</span></p>
                     <p><span>主演 :</span><span>{{val.protagonist}}</span></p>
                 </div>
-                <div class="butn"><p>购票</p></div>
+                <div class="butn" @click="filmchild(val)"><p>购票</p></div>
             </li>
         </ul>
         <ul v-if="!onoff">
@@ -27,7 +27,7 @@
                     <p><span>类型 :</span><span>{{val.genre}}</span></p>
                     <p><span>主演 :</span><span>{{val.protagonist}}</span></p>
                 </div>
-                <div class="butn"><p style="background:blue">预售</p></div>
+                <div class="butn" @click="filmchild(val)"><p style="background:blue">预售</p></div>
             </li>
         </ul>
     </div>
@@ -47,7 +47,13 @@ export default {
         const datafilm = await phfilmAPI()
         this.hotary = datafilm.filter(item=>+new Date(item.date) < + new Date())
         this.comingary = datafilm.filter(item=>+new Date(item.date) > + new Date())
-    }
+    },
+    methods: {
+        filmchild(val) {
+            sessionStorage.setItem('films',JSON.stringify(val))
+            this.$router.replace('/filmchild')
+        },
+    },
 }
 </script>
 

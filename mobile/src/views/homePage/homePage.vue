@@ -25,7 +25,7 @@
                     <span class="red-name">正在热映</span><span class="more">全部{{hotary.length}}部 <span class=" arrow"></span></span>
                 </div>
                 <ul>
-                    <li v-for="(val,key) in hotary.slice(0,6)">
+                    <li v-for="(val,key) in hotary.slice(0,6)"  @click="filmchild(val)">
                         <img :src="server1" alt="">
                         <div class="hot"><span class="hotname">{{val.name}}</span><span class="grade">{{`${val.grade}`.length>2?val.grade:val.grade+'.0'}}</span></div>
                         <div class="buy">购票</div>
@@ -37,7 +37,7 @@
                     <span class="blue-name">即将上映</span><span class="more">全部{{comingary.length}}部 <span class=" arrow"></span></span>
                 </div>
                 <ul>
-                    <li v-for="(val,key) in comingary.slice(0,6)">
+                    <li v-for="(val,key) in comingary.slice(0,6)"  @click="filmchild(val)">
                         <img :src="server1" alt="">
                         <div class="coming"><span class="comingname">{{val.name}}</span><span class="grade">{{`${val.grade}`.length>2?val.grade:val.grade+'.0'}}</span></div>
                         <div class="presell">预售</div>
@@ -62,6 +62,11 @@ export default {
         }
     },
     methods: {
+        filmchild(val) {
+            console.log(1)
+            sessionStorage.setItem('films',JSON.stringify(val))
+            this.$router.replace('/filmchild')
+        },
     },
     async mounted() {
         new Swiper ('.swiper-container', {

@@ -33,6 +33,12 @@ const routes = [
       }
     ]
   }
+  ,
+  {
+    path:'/filmchild',
+    name:'filmchild',
+    component: () => import('../views/film/filmchild.vue')
+  }
 ]
 
 const router = new VueRouter({

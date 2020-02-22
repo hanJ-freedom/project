@@ -2,7 +2,7 @@
     <div id="my">
         <div class="header">
             <div class="headport portback"></div>
-            <span>登录/注册</span>
+            <span @click="$router.push('/user')">{{username}}</span>
         </div>
         <ul>
             <li>
@@ -23,7 +23,16 @@
 
 <script>
 export default {
-
+    data() {
+        return {
+            username:'登录/注册'
+        }
+    },
+    mounted(){
+        if(sessionStorage.getItem('admid')){
+            this.username = JSON.parse(sessionStorage.getItem('admid')).name
+        }
+    }
 }
 </script>
 

@@ -38,6 +38,24 @@ const routes = [
     path:'/filmchild',
     name:'filmchild',
     component: () => import('../views/film/filmchild.vue')
+  },
+  {
+    path:'/user',
+    name:'user',
+    component: () => import('../views/my/myuser.vue'),
+    redirect:'/user/sign_in',
+    children:[
+      {
+        path:'sign_in',
+        name:'sign_in',
+        component: () => import('../views/my/sign_register/sign_in.vue')
+      },
+      {
+        path:'register',
+        name:'register',
+        component: () => import('../views/my/sign_register/register.vue')
+      }
+    ]
   }
 ]
 

@@ -51,7 +51,7 @@ export default {
     methods: {
         filmchild(val) {
             sessionStorage.setItem('films',JSON.stringify(val))
-            this.$router.replace('/filmchild')
+            this.$router.push('/filmchild')
         },
     },
 }

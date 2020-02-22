@@ -65,7 +65,7 @@ export default {
         filmchild(val) {
             console.log(1)
             sessionStorage.setItem('films',JSON.stringify(val))
-            this.$router.replace('/filmchild')
+            this.$router.push('/filmchild')
         },
     },
     async mounted() {

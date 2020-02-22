@@ -632,4 +632,37 @@ app.post('/phcinema',(req,res)=>{
     res.json(datacinema)
 })
 
+//手机端用户登录验证
+app.post('/phlogin', (req, res) => {
+    const { body } = req;
+    let o = datausers.findIndex(item => item.name === body.name);
+    let obj = null;
+    if (o !== -1) {
+        if (datausers[o].password === body.password) {
+            let admin = {name:datausers[o].name,id:datausers[o].id}
+            const token = jwt.sign({
+                name: body.name,
+                password: body.password
+            },secret,{expiresIn:60*60})
+            obj = {
+                code: 0,
+                type: '登录成功',
+                token,
+                admin:JSON.stringify(admin)
+            }
+        } else {
+            obj = {
+                code: 1,
+                type: '账号或密码错误'
+            }
+        }
+    } else {
+        obj = {
+            code: 1,
+            type: '账号或密码错误'
+        }
+    }
+    res.json(obj);
+})
+
 app.listen(80);

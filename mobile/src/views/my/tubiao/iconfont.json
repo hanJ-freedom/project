@@ -1,0 +1,16 @@
+{
+  "id": "1636959",
+  "name": "电影购票",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "819494",
+      "name": "叉",
+      "font_class": "cha",
+      "unicode": "e639",
+      "unicode_decimal": 58937
+    }
+  ]
+}

@@ -32,7 +32,6 @@ export default {
     },
     async mounted() {
         this.datacinema = await phcinemaAPI()
-        console.log(this.datacinema)
     }
 }
 </script>
